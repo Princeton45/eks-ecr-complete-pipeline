@@ -1,0 +1,22 @@
+graph TD
+    A[Start CI/CD Pipeline] --> B[CI: Increment Version]
+    B --> C[CI: Build Java Maven Artifact]
+    C --> D[CI: Build Docker Image]
+    D --> E[CI: Push to AWS ECR]
+    E --> F[CD: Deploy to EKS Cluster]
+    F --> G[CD: Commit Version Update]
+    G --> H[End Pipeline]
+
+    subgraph Technologies
+    I[Kubernetes]
+    J[Jenkins]
+    K[AWS EKS]
+    L[AWS ECR]
+    M[Java/Maven]
+    N[Docker]
+    O[Git]
+    end
+
+    style A fill:#90EE90
+    style H fill:#FFB6C1
+    style Technologies fill:#f9f,stroke:#333,stroke-width:4px
