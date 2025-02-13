@@ -44,18 +44,25 @@ pipeline {
             }
         }
         stage('deploy') {
-            steps {
-                script {
+            environment {
                    AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
                    AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
                    APP_NAME = 'java-maven-app'
+            }
+            steps {
+                script {
+                    echo "deploying docker image..."
+                    sh 'envsubst < kubernetes/deployment.yaml | kubectl apply -f -'
+                    sh 'envsubst < kubernetes/service.yaml | kubectl apply -f -'
                 }
             }
-        }
+
         stage('commit version update'){
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'jenkins-github', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                        sh "git config --global user.email 'jenkins@example.com'"
+                        sh "git config --global user.name 'Jenkins'"
                         sh "git remote set-url origin https://${USER}:${PASS}@github.com/Princeton45/eks-ecr-complete-pipeline.git"
                         sh 'git add .'
                         sh 'git commit -m "ci: version bump"'
