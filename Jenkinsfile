@@ -67,7 +67,7 @@ pipeline {
                         sh "git remote set-url origin https://${USER}:${PASS}@github.com/Princeton45/eks-ecr-complete-pipeline.git"
                         sh 'git add .'
                         sh 'git commit -m "ci: version bump"'
-                        sh 'git push origin HEAD:master'
+                        sh 'git push origin HEAD:main'
                     }
                 }
             }
