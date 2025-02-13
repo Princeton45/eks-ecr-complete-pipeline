@@ -72,7 +72,7 @@ Successful pipeline run:
 
 ![jenkins-run](https://github.com/Princeton45/eks-ecr-complete-pipeline/blob/main/images/jenkins-run.png)
 
-The Docker images being uploaded to AWS ECR:
+The Docker image being uploaded to AWS ECR:
 
 ![all-ecr](https://github.com/Princeton45/eks-ecr-complete-pipeline/blob/main/images/all-ecr.png)
 
