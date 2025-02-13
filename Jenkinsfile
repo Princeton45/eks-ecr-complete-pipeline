@@ -56,6 +56,7 @@ pipeline {
                     sh 'envsubst < kubernetes/service.yaml | kubectl apply -f -'
                 }
             }
+        }  // Added this closing brace
 
         stage('commit version update'){
             steps {
