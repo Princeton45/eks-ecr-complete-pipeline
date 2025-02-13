@@ -3,7 +3,11 @@
 pipeline {
     agent any
     tools {
-        maven 'Maven'
+        maven 'maven-3.9.9'
+    }
+    environment {
+        DOCKER_REPO_SERVER = "251770415749.dkr.ecr.us-east-1.amazonaws.com/java-maven-app"
+        DOCKER_REPO = "${DOCKER_REPO_SERVER}/java-maven-app"
     }
     stages {
         stage('increment version') {
@@ -31,7 +35,7 @@ pipeline {
             steps {
                 script {
                     echo "building the docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                    withCredentials([usernamePassword(credentialsId: 'ecr-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]){
                         sh "docker build -t ${DOCKER_REPO}:${IMAGE_NAME} ."
                         sh 'echo $PASS | docker login -u $USER --password-stdin ${DOCKER_REPO_SERVER}'
                         sh "docker push ${DOCKER_REPO}:${IMAGE_NAME}"
@@ -42,18 +46,20 @@ pipeline {
         stage('deploy') {
             steps {
                 script {
-                   echo 'deploying docker image...'
+                   AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
+                   AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
+                   APP_NAME = 'java-maven-app'
                 }
             }
         }
         stage('commit version update'){
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'gitlab-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]){
-                        sh "git remote set-url origin https://${USER}:${PASS}@gitlab.com/twn-devops-bootcamp/latest/11-eks/java-maven-app.git"
+                    withCredentials([usernamePassword(credentialsId: 'jenkins-github', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                        sh "git remote set-url origin https://${USER}:${PASS}@github.com/Princeton45/eks-ecr-complete-pipeline.git"
                         sh 'git add .'
                         sh 'git commit -m "ci: version bump"'
-                        sh 'git push origin HEAD:jenkins-jobs'
+                        sh 'git push origin HEAD:master'
                     }
                 }
             }
